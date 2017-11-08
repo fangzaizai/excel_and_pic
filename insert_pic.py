@@ -63,29 +63,30 @@ def resize():
 	image_resized.save('2.jpg')
 
 def ftp_get_image():
-	ftp_server='192.168.5.121'
-	username='root'
-	password='root'
+	ftp_server='192.168.5.199'
+	username='ubuntu'
+	password='ubuntu'
 	ftp=FTP()
 
 	ftp.set_debuglevel(2)
 	ftp.connect(ftp_server,21)
 	ftp.login(username,password)
 
-	pic_path='/home/ubuntu/FTP'+cell_value
-	print ftp.gwtwelcome()
+	pic_path='/home/ubuntu/FTP//LINDASceneAlarm/20171107/13/{1C59EA90-9963-4405-849B-200A66F39133}-20171107131802560.jpg'
+	#print ftp.gwtwelcome()
 	buffersize=1024
-	local_pic=cell_value
+	local_pic='666.jpg'
 	fp=open(local_pic,'wb')
-	ftp.retrbinary('RETR' + pic_path, fp.write,buffersize)
+	ftp.retrbinary('RETR ' + pic_path, fp.write,buffersize)
 	ftp.set_debuglevel(0)
 	fp.close()
 	ftp.quit()
 	
 
-
-
+#ftp://192.168.5.197/home/ubuntu/FTP/LINDASceneAlarm/20171108/22/\{DF452E44-B458-446D-9273-35472618DE73\}-20171108222522756.jpg
+#ftp://192.168.5.121/home/ubuntu/FTP//LINDASceneAlarm/20171108/14/%7BE27C6577-92BC-4B8E-8F9D-5627C271849A%7D-20171108140439911.jpg
 
 
 if __name__ == '__main__':
-	insert_pic('1.xls')
+	#insert_pic('1.xls')
+	ftp_get_image()
