@@ -3,7 +3,7 @@ import xlwt, xlrd
 import sys
 from xlutils.copy import copy
 import xlsxwriter
-from PIL import Image
+#from PIL import Image
 
 def open_xls(file):
 	try:
@@ -47,7 +47,7 @@ def insert_pic(file):
 	#worksheet.set_column(0,13, 80)
 	for i in xrange(nrows):
 		worksheet.set_row(i,160)
-		for j in xrange(ncol):
+		for j in xrange(ncols):
 			cell_value=table.cell_value(i,j)
 			worksheet.write(i,j,cell_value)
 	worksheet.insert_image('M5','1.jpg')
