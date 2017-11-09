@@ -5,6 +5,8 @@ from xlutils.copy import copy
 import xlsxwriter
 from PIL import Image
 from ftplib import FTP
+import datetime
+import db_conn
 
 path=os.getcwd()
 def open_xls(file):
@@ -37,14 +39,14 @@ def data_byindex(file):
 	copydata.save('2.xls')
 	return table
 
-def format_excel(file):
+def format_excel_pri(file):
 	data=open_xls(file)
 	table=data.sheets()[0]
 	#format1 = table.format()
 	nrows=table.nrows
 	ncols=table.ncols
 	#print type(table)
-	workbook = xlsxwriter.Workbook('3.xls')
+	workbook = xlsxwriter.Workbook(r'报警记录统计.xls')
 	worksheet = workbook.add_worksheet()
 	worksheet.set_column(12,13, 30)
 	#worksheet.set_column(0,13, 80)
@@ -63,6 +65,34 @@ def format_excel(file):
 				pic_path=ftp_get_image(ftp, i, 13, cell_value)
 				resize(pic_path)
 				worksheet.insert_image('N'+str(i), pic_path)
+				print 'insert another pic'			
+	ftp_close(ftp)
+	workbook.close()
+def format_excel(file):
+	workbook = xlsxwriter.Workbook('报警记录统计.xls')
+	worksheet = workbook.add_worksheet()
+	worksheet.set_column(4,5, 30)
+	conn=db_conn.db_conn('192.168.5.199', 'lindamaster','postgres', 'vion')
+	result=db_conn.db_query(conn)
+	db_conn.db_close(conn)
+	ncols=len(result)
+	#worksheet.set_column(0,13, 80)
+	ftp=ftp_open('192.168.5.199')
+	worksheet.write(0,0,u'报警记录统计') #此处需要一个merge
+	for i in range(1, ncols+1):  #针对每一行，依次填充列值
+		worksheet.set_row(i,150)
+		for j in xrange(6):
+			cell_value=result[i-1][j]
+			worksheet.write(i,j,cell_value)
+			if (j == 5):
+				pic_path=ftp_get_image(ftp, i, 12, cell_value)
+				resize(pic_path)
+				worksheet.insert_image('E'+str(i), pic_path)
+				print 'insert pic'
+			elif j==6:  #这个位置耗时太多,ASCII
+				pic_path=ftp_get_image(ftp, i, 13, cell_value)
+				resize(pic_path)
+				worksheet.insert_image('F'+str(i), pic_path)
 				print 'insert another pic'			
 	ftp_close(ftp)
 	workbook.close()
