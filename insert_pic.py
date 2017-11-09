@@ -1,11 +1,12 @@
 # -*-coding:utf-8-*-
 import xlwt, xlrd
-import sys
+import sys, os
 from xlutils.copy import copy
 import xlsxwriter
 from PIL import Image
 from ftplib import FTP
 
+path=os.getcwd()
 def open_xls(file):
 	try:
 		data=xlrd.open_workbook(file,on_demand=True, formatting_info=True)
@@ -36,57 +37,69 @@ def data_byindex(file):
 	copydata.save('2.xls')
 	return table
 
-def insert_pic(file):
+def format_excel(file):
 	data=open_xls(file)
 	table=data.sheets()[0]
+	#format1 = table.format()
 	nrows=table.nrows
 	ncols=table.ncols
 	#print type(table)
 	workbook = xlsxwriter.Workbook('3.xls')
 	worksheet = workbook.add_worksheet()
-	worksheet.set_column(12,13, 25)
+	worksheet.set_column(12,13, 30)
 	#worksheet.set_column(0,13, 80)
+	ftp=ftp_open('192.168.5.199')
 	for i in xrange(nrows):
 		worksheet.set_row(i,150)
 		for j in xrange(ncols):
 			cell_value=table.cell_value(i,j)
 			worksheet.write(i,j,cell_value)
-	worksheet.insert_image('M6','2.jpg')
-	worksheet.insert_image('N6','2.jpg')
-	worksheet.insert_image('N5','2.jpg')
-
+			if (j == 12 and i >3):
+				pic_path=ftp_get_image(ftp, i, 12, cell_value)
+				resize(pic_path)
+				worksheet.insert_image('M'+str(i), pic_path)
+				print 'insert pic'
+			elif (j==13 and i >3):
+				pic_path=ftp_get_image(ftp, i, 13, cell_value)
+				resize(pic_path)
+				worksheet.insert_image('N'+str(i), pic_path)
+				print 'insert another pic'			
+	ftp_close(ftp)
 	workbook.close()
 
-def resize():
-	image=Image.open('1.jpg')
+def resize(pic_path):
+	image=Image.open(pic_path)
 	image_resized=image.resize((200,200),Image.ANTIALIAS)
-	image_resized.save('2.jpg')
+	image_resized.save(pic_path)
+	print 'resize pic'
 
-def ftp_get_image():
-	ftp_server='192.168.5.199'
+def ftp_open(server):
 	username='ubuntu'
 	password='ubuntu'
 	ftp=FTP()
-
 	ftp.set_debuglevel(2)
-	ftp.connect(ftp_server,21)
+	ftp.connect(server,21)
 	ftp.login(username,password)
+	return ftp
 
-	pic_path='/home/ubuntu/FTP//LINDASceneAlarm/20171107/13/{1C59EA90-9963-4405-849B-200A66F39133}-20171107131802560.jpg'
-	#print ftp.gwtwelcome()
+def ftp_close(ftp):
+	ftp.quit()
+
+def ftp_get_image(ftp, row, col, pic_path):
+	pic_root_path='/home/ubuntu/FTP/'+ pic_path  #/LINDASceneAlarm/20171107/13/{1C59EA90-9963-4405-849B-200A66F39133}-20171107131802560.jpg'
 	buffersize=1024
-	local_pic='666.jpg'
+	local_pic=path+'/pic/'+str(row)+str(col)+'.jpg'
 	fp=open(local_pic,'wb')
-	ftp.retrbinary('RETR ' + pic_path, fp.write,buffersize)
+	ftp.retrbinary('RETR ' + pic_root_path, fp.write,buffersize)
+	print 'get pic'
 	ftp.set_debuglevel(0)
 	fp.close()
-	ftp.quit()
-	
+	return local_pic
 
-#ftp://192.168.5.197/home/ubuntu/FTP/LINDASceneAlarm/20171108/22/\{DF452E44-B458-446D-9273-35472618DE73\}-20171108222522756.jpg
-#ftp://192.168.5.121/home/ubuntu/FTP//LINDASceneAlarm/20171108/14/%7BE27C6577-92BC-4B8E-8F9D-5627C271849A%7D-20171108140439911.jpg
+#def insert_pic(rows,pic):
+
 
 
 if __name__ == '__main__':
-	#insert_pic('1.xls')
-	ftp_get_image()
+	format_excel('1.xls')
+	#ftp_get_image(12,3,'/LINDASceneAlarm/20171107/13/{1C59EA90-9963-4405-849B-200A66F39133}-20171107132929015.jpg')
