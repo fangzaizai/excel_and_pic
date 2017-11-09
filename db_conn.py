@@ -2,8 +2,7 @@
 import psycopg2, os
 
 def db_conn(server, dbname, username, password):
-	try:
-		conn = psycopg2.connect(database=dbname, user=username, password=password, host=server, port='5432')
+	conn = psycopg2.connect(database=dbname, user=username, password=password, host=server, port='5432')
 	return conn
 
 def db_close(conn):
@@ -30,7 +29,7 @@ where A.fr_alarmtime between '2017-11-08 10:08:00' and '2017-11-08 10:17:00'
 	#file = open('1.txt','wb')
 	#file.write(str(result))
 	#file.close()
-	print result[1][1]
+	print result[0][0]
 	return result
 
 if __name__ == '__main__':

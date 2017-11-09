@@ -68,8 +68,8 @@ def format_excel_pri(file):
 				print 'insert another pic'			
 	ftp_close(ftp)
 	workbook.close()
-def format_excel(file):
-	workbook = xlsxwriter.Workbook('报警记录统计.xls')
+def format_excel():
+	workbook = xlsxwriter.Workbook(u'baojing.xls')
 	worksheet = workbook.add_worksheet()
 	worksheet.set_column(4,5, 30)
 	conn=db_conn.db_conn('192.168.5.199', 'lindamaster','postgres', 'vion')
@@ -84,18 +84,19 @@ def format_excel(file):
 		for j in xrange(6):
 			cell_value=result[i-1][j]
 			worksheet.write(i,j,cell_value)
-			if (j == 5):
+			if (j == 4):
 				pic_path=ftp_get_image(ftp, i, 12, cell_value)
 				resize(pic_path)
-				worksheet.insert_image('E'+str(i), pic_path)
+				worksheet.insert_image('E'+str(i-1), pic_path)
 				print 'insert pic'
-			elif j==6:  #这个位置耗时太多,ASCII
+			elif j==5:  #这个位置耗时太多,ASCII
 				pic_path=ftp_get_image(ftp, i, 13, cell_value)
 				resize(pic_path)
-				worksheet.insert_image('F'+str(i), pic_path)
+				worksheet.insert_image('F'+str(i-1), pic_path)
 				print 'insert another pic'			
 	ftp_close(ftp)
 	workbook.close()
+	print 'ßclose'
 
 def resize(pic_path):
 	image=Image.open(pic_path)
@@ -131,5 +132,5 @@ def ftp_get_image(ftp, row, col, pic_path):
 
 
 if __name__ == '__main__':
-	format_excel('1.xls')
+	format_excel()
 	#ftp_get_image(12,3,'/LINDASceneAlarm/20171107/13/{1C59EA90-9963-4405-849B-200A66F39133}-20171107132929015.jpg')
