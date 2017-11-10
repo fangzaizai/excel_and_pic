@@ -22,7 +22,7 @@ INNER JOIN face_feature_info AS B
 ON A .person_id = B.person_id)
 INNER JOIN face_attri_result AS C
 on A.fr_alarm_id = C.recordid)
-where A.fr_alarmtime between '2017-11-08 10:08:00' and '2017-11-08 10:17:00'
+where A.fr_alarmtime between '2017-11-10 16:55:00' and '2017-11-10 17:09:00'
 '''
 	cur.execute(sql)
 	result=cur.fetchall()

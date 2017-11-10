@@ -1,12 +1,15 @@
 # -*-coding:utf-8-*-
 import xlwt, xlrd
-import sys, os
+import os
 from xlutils.copy import copy
 import xlsxwriter
 from PIL import Image
 from ftplib import FTP
 import datetime
 import db_conn
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 path=os.getcwd()
 def open_xls(file):
@@ -38,7 +41,7 @@ def data_byindex(file):
 	#return table
 	copydata.save('2.xls')
 	return table
-
+'''
 def format_excel_pri(file):
 	data=open_xls(file)
 	table=data.sheets()[0]
@@ -68,35 +71,48 @@ def format_excel_pri(file):
 				print 'insert another pic'			
 	ftp_close(ftp)
 	workbook.close()
+	'''
 def format_excel():
-	workbook = xlsxwriter.Workbook(u'baojing.xls')
+	workbook = xlsxwriter.Workbook('222222222.xls')
+	date_format = workbook.add_format({'num_format':'yyyy-mm-dd hh:mm:ss','align':'center','valign':'vcenter'})
+	center_format = workbook.add_format({'align':'center','valign':'vcenter'})
 	worksheet = workbook.add_worksheet()
-	worksheet.set_column(4,5, 30)
+	worksheet.set_column(0,5, 27)
+	#connect db and close
+	print 'start connect database'
 	conn=db_conn.db_conn('192.168.5.199', 'lindamaster','postgres', 'vion')
+	print 'start query data'
 	result=db_conn.db_query(conn)
+	print 'start close database'
 	db_conn.db_close(conn)
+
 	ncols=len(result)
-	#worksheet.set_column(0,13, 80)
+	print 'start connect ftp'
 	ftp=ftp_open('192.168.5.199')
+	print 'ftp conn over'
 	worksheet.write(0,0,u'报警记录统计') #此处需要一个merge
-	for i in range(1, ncols+1):  #针对每一行，依次填充列值
+	#worksheet.insert_image('F1', '104.jpg')
+	for i in range(0, ncols+1):  #针对每一行，依次填充列值
 		worksheet.set_row(i,150)
 		for j in xrange(6):
 			cell_value=result[i-1][j]
-			worksheet.write(i,j,cell_value)
-			if (j == 4):
-				pic_path=ftp_get_image(ftp, i, 12, cell_value)
+			if j == 4:
+				pic_path=ftp_get_image(ftp, i, 4, cell_value)
 				resize(pic_path)
-				worksheet.insert_image('E'+str(i-1), pic_path)
-				print 'insert pic'
+				worksheet.insert_image(i,j, pic_path)
 			elif j==5:  #这个位置耗时太多,ASCII
-				pic_path=ftp_get_image(ftp, i, 13, cell_value)
+				pic_path=ftp_get_image(ftp, i, 5, cell_value)
 				resize(pic_path)
-				worksheet.insert_image('F'+str(i-1), pic_path)
-				print 'insert another pic'			
+				worksheet.insert_image(i,j, pic_path)
+				print 'insert another pic'
+			elif j == 0:
+				worksheet.write(i,j,cell_value, date_format)
+			else:
+				worksheet.write(i,j,cell_value,center_format)
+
+			
 	ftp_close(ftp)
 	workbook.close()
-	print 'ßclose'
 
 def resize(pic_path):
 	image=Image.open(pic_path)
@@ -119,16 +135,15 @@ def ftp_close(ftp):
 def ftp_get_image(ftp, row, col, pic_path):
 	pic_root_path='/home/ubuntu/FTP/'+ pic_path  #/LINDASceneAlarm/20171107/13/{1C59EA90-9963-4405-849B-200A66F39133}-20171107131802560.jpg'
 	buffersize=1024
-	local_pic=path+'/pic/'+str(row)+str(col)+'.jpg'
-	fp=open(local_pic,'wb')
-	ftp.retrbinary('RETR ' + pic_root_path, fp.write,buffersize)
-	print 'get pic'
+	local_pic=path+'\pic\\'+str(row)+str(col)+'.jpg'
+	try:
+		fp=open(local_pic,'wb')
+		ftp.retrbinary('RETR ' + pic_root_path, fp.write,buffersize)
+	except IOError as ioerr:
+		print 'Error:%s' % (ioerr.errno)
 	ftp.set_debuglevel(0)
 	fp.close()
 	return local_pic
-
-#def insert_pic(rows,pic):
-
 
 
 if __name__ == '__main__':
