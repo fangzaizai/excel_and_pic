@@ -80,7 +80,7 @@ def format_excel():
 	worksheet.set_column(0,5, 27)
 	#connect db and close
 	print 'start connect database'
-	conn=db_conn.db_conn('192.168.5.199', 'lindamaster','postgres', 'vion')
+	conn=db_conn.db_conn()
 	print 'start query data'
 	result=db_conn.db_query(conn)
 	print 'start close database'
