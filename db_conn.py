@@ -39,7 +39,7 @@ def db_query(conn):
 	#Start_time=datetime.datetime.strptime(paras['Starttime'],"%Y-%m-%d %H:%M:%S")
 	#End_time=datetime.datetime.strptime(paras['Endtime'],"%Y-%m-%d %H:%M:%S")
 	cur=conn.cursor()
-	sql_header = "SELECT A.fr_alarmtime,A.fr_alarm_cameraname,A.fr_alarm_similarity,A .person_name,C.imagepath1,B.photo_path FROM ((face_recognize_alarm AS A JOIN face_feature_info AS B ON A .person_id = B.person_id) INNER JOIN face_attri_result AS C on A.fr_alarm_id = C.recordid) where A.fr_alarmtime between "
+	sql_header = "SELECT A.fr_alarmtime,A.fr_alarm_cameraname,A.fr_alarm_similarity,A .person_name,B.photo_path,C.alarmfile_path FROM ((face_recognize_alarm AS A JOIN face_feature_info AS B ON A .person_id = B.person_id) INNER JOIN sct_alarmfile AS C on A.fr_alarm_id = C.alarm_id) where A.fr_alarmtime between "
 	sql_tail=" order by A.fr_alarmtime desc"
 	sql=sql_header+str(paras['Starttime'])+' and '+str(paras['Endtime'])+ sql_tail
 	print sql

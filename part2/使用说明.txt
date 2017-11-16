@@ -1,0 +1,5 @@
+1.使用前，将待导出图片的盒子的图片目录加权限，操作命令:1.cd /home/ubuntu/FTP（新镜像）或者cd /home/ubuntu/public（旧镜像）2.chmod 777 -R ./
+2.修改配置文件，注意：时间格式的引号不能为中文引号；
+3.打开命令行cmd，打开工具所在目录,例：cd C:\Users\Administrator\Desktop\；
+4.输入可执行文件名称：insert_pic.exe
+5.待屏幕打印完成后，打开工具目录下alarm.xls即为目标文件，相同目录下pic文件夹内存储了相对的图片，不用可删除
